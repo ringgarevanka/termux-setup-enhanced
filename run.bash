@@ -105,7 +105,7 @@ initialize_environment() {
 
     # Move old log file if exist
     if [ -f "$LOG_FILE" ]; then
-        OLD_LOG_FILE="$HOME_DIR/termux_setup_$(stat --format=%y "$LOG_FILE" | sed 's/ /_/g' | sed 's/://g').log"
+        readonly OLD_LOG_FILE="$HOME_DIR/termux_setup_$(stat --format=%y "$LOG_FILE" | sed 's/ /_/g' | sed 's/://g').log"
         mv "$LOG_FILE" "$OLD_LOG_FILE"
     fi
 
@@ -116,6 +116,14 @@ initialize_environment() {
     # Check network connectivity
     if ! check_network; then
         log_message "ERROR" "Network check failed"
+        cleanup
+        exit 1
+    fi
+    
+    readonly VERSION=$(wget -q -O - "https://raw.githubusercontent.com/ringgarevanka/-/refs/heads/_/termux-setup-version")
+    if [[ "$VERSION" != "$SCRIPT_VERSION" ]]; then
+        display_red "Error: $SCRIPT_VERSION version does not match $VERSION"
+        log_message "ERROR" "Version check failed"
         cleanup
         exit 1
     fi
@@ -319,9 +327,8 @@ install_essential_packages() {
         texinfo
     )
 
-    show_message "Installing Termux packages..."
     for package in "${packages[@]}"; do
-        show_message "Installing package: $package"
+        show_message "Installing Termux package: $package"
         install_package "pkg install" "$package" "-y"
     done
 }
@@ -356,9 +363,8 @@ install_python_packages() {
         pylint
     )
 
-    show_message "Installing Python packages..."
     for package in "${packages[@]}"; do
-        show_message "Installing package: $package"
+        show_message "Installing Python package: $package"
         install_package "pip install --upgrade" "$package"
     done
 }
@@ -379,9 +385,8 @@ install_node_packages() {
         http-server
     )
 
-    show_message "Installing Node.js packages..."
     for package in "${packages[@]}"; do
-        show_message "Installing package: $package"
+        show_message "Installing Node.js package: $package"
         install_package "npm install -g" "$package"
     done
 }
@@ -539,7 +544,7 @@ EOF
 
 # System cleanup
 cleanup() {
-    show_message "Performing system cleanup..."
+    display_green "Performing system cleanup..."
 
     # Clean package cache
     pkg clean

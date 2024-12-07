@@ -179,7 +179,7 @@ install_repositories() {
 
     for repo in "${repos[@]}"; do
         show_message "Adding repository: $repo"
-        install_package "pkg install" "$package" "-y"
+        install_package "pkg install" "$repo" "-y"
     done
 }
 

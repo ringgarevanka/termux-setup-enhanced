@@ -1,9 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # Script Information
-readonly SCRIPT_NAME="Termux Setup Enhanced"
-readonly SCRIPT_DESCRIPTION="A streamlined configuration and script setup for Termux to simplify your environment setup."
-readonly SCRIPT_VERSION="1.0.241207 Enhanced"
+readonly SCRIPT_NAME="TERMUX SETUP"
+readonly SCRIPT_DESCRIPTION="A configuration and script setup for Termux environment."
+readonly SCRIPT_VERSION="1.0.241207"
 readonly DEVELOPER="Ringga"
 readonly DEV_USERNAME="@ringgarevanka"
 
@@ -103,7 +103,13 @@ initialize_environment() {
     trap 'log_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
     trap 'display_red "Signal caught, cleaning up..."; cleanup; exit 1' INT TERM HUP
 
-    # Create log file
+    # Move old log file if exist
+    if [ -f "$LOG_FILE" ]; then
+        OLD_LOG_FILE="$HOME_DIR/termux_setup_$(stat --format=%y "$LOG_FILE" | sed 's/ /_/g' | sed 's/://g').log"
+        mv "$LOG_FILE" "$OLD_LOG_FILE"
+    fi
+
+    # Create new log file
     touch "$LOG_FILE"
     log_message "INFO" "Starting Termux setup script v$SCRIPT_VERSION"
 
@@ -326,24 +332,24 @@ install_python_packages() {
         # Package Management and Virtual Environments
         setuptools
         virtualenv
-        
+
         # Interactive Development
         ipython
-        
+
         # Web Development Frameworks
         flask
         django
-        
+
         # Web Scraping, Automation and Networking
         requests[socks]
         requests
         beautifulsoup4
         selenium
         httpie
-        
+
         # Image and Video Processing
         pillow
-        
+
         # Code Quality and Testing
         pytest
         black
@@ -355,16 +361,6 @@ install_python_packages() {
         show_message "Installing package: $package"
         install_package "pip install --upgrade" "$package"
     done
-    # for package in "${packages[@]}"; do
-        # display_yellow "Installing Python package: $package"
-        # if pip install --upgrade "$package" >/dev/null 2>&1; then
-            # display_green "Successfully installed $package"
-            # log_message "INFO" "Python package installed: $package"
-        # else
-            # display_red "Failed to install Python package: $package"
-            # log_message "ERROR" "Failed to install Python package: $package"
-        # fi
-    # done
 }
 
 # Node.js packages installation
@@ -388,16 +384,6 @@ install_node_packages() {
         show_message "Installing package: $package"
         install_package "npm install -g" "$package"
     done
-    # for package in "${packages[@]}"; do
-        # display_yellow "Installing Node.js package: $package"
-        # if npm install -g "$package" >/dev/null 2>&1; then
-            # display_green "Successfully installed $package"
-            # log_message "INFO" "Node.js package installed: $package"
-        # else
-            # display_red "Failed to install Node.js package: $package"
-            # log_message "ERROR" "Failed to install Node.js package: $package"
-        # fi
-    # done
 }
 
 # PHP Composer setup

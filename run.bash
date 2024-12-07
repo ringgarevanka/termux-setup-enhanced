@@ -3,7 +3,7 @@
 # Script Information
 readonly SCRIPT_NAME="Termux Setup Enhanced"
 readonly SCRIPT_DESCRIPTION="A streamlined configuration and script setup for Termux to simplify your environment setup."
-readonly SCRIPT_VERSION="1.0 Enhanced"
+readonly SCRIPT_VERSION="1.0.241207 Enhanced"
 readonly DEVELOPER="Ringga"
 readonly DEV_USERNAME="@ringgarevanka"
 
@@ -119,13 +119,13 @@ initialize_environment() {
 install_package() {
     local command="$1"
     local package="$2"
-    local extra="$3"
+    local extra="${3:-" "}" # If extra is empty, defaults to " "
     local retry_count=3
     local attempt=1
 
     while ((attempt <= retry_count)); do
         display_yellow "Installing $package (attempt $attempt/$retry_count)..."
-        if "$command" "$package" "$extra" >/dev/null 2>&1; then
+        if $command "$package" $extra >/dev/null 2>&1; then
             display_green "Successfully installed $package"
             log_message "INFO" "Package installed: $package"
             return 0

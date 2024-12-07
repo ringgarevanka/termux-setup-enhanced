@@ -117,13 +117,15 @@ initialize_environment() {
 
 # Package management functions
 install_package() {
-    local package="$1"
+    local command="$1"
+    local package="$2"
+    local extra="$3"
     local retry_count=3
     local attempt=1
 
     while ((attempt <= retry_count)); do
         display_yellow "Installing $package (attempt $attempt/$retry_count)..."
-        if pkg install -y "$package" >/dev/null 2>&1; then
+        if "$command" "$package" "$extra" >/dev/null 2>&1; then
             display_green "Successfully installed $package"
             log_message "INFO" "Package installed: $package"
             return 0
@@ -177,7 +179,7 @@ install_repositories() {
 
     for repo in "${repos[@]}"; do
         show_message "Adding repository: $repo"
-        install_package "$repo"
+        install_package "pkg install" "$package" "-y"
     done
 }
 
@@ -195,12 +197,12 @@ install_essential_packages() {
         util-linux
         proot
         proot-distro
-    
+
         # Version Management & Control
         git
         git-lfs
         subversion
-    
+
         # Development Tools
         make
         clang
@@ -211,13 +213,13 @@ install_essential_packages() {
         autoconf
         automake
         libtool
-    
+
         # Programming language
         ## Python
         python
         python2
         python-pip
-    
+
         ## Java
         openjdk-11
         openjdk-11-x
@@ -225,7 +227,7 @@ install_essential_packages() {
         openjdk-17-x
         openjdk-21
         openjdk-21-x
-    
+
         ## Other Languages
         nodejs-lts
         ruby
@@ -233,14 +235,14 @@ install_essential_packages() {
         perl
         php
         golang
-    
+
         # Network Tools
         ## Connectivity Tools
         curl
         wget
         openssh
         sshpass
-    
+
         ## Network Analysis Tools
         nmap
         dnsutils
@@ -248,20 +250,16 @@ install_essential_packages() {
         httping
         tcpdump
         wireshark-gtk
-    
+
         ## Browser Text
         w3m
-        ddgr
-    
-        ## Network Access
-        Cloudflared
-    
+
         # Text & Processing Tools
         ## Editor
         vim
         nano
         emacs
-    
+
         ## Text Utilities
         less
         grep
@@ -269,32 +267,32 @@ install_essential_packages() {
         jq
         figlet
         libxml2-utils
-    
+
         # Compression Tool
         zip
         unzip
         tar
         gzip
         bzip2
-    
+
         # Monitoring System
         fastfetch
         htop
         ncdu
-    
+
         # Media Tools
         ffmpeg
         imagemagick
-    
+
         # Security
         openssl
         gnupg
         sshpass
-    
+
         # Database
         sqlite
         postgresql
-    
+
         # Additional Utilities
         fzf
         ripgrep
@@ -303,21 +301,22 @@ install_essential_packages() {
         tree
         fakeroot
         cowsay
-    
+
         # Shell Environment
         zsh
         fish
         tmux
         screen
-    
+
         # Documentation
         man
         texinfo
     )
 
+    show_message "Installing Termux packages..."
     for package in "${packages[@]}"; do
         show_message "Installing package: $package"
-        install_package "$package"
+        install_package "pkg install" "$package" "-y"
     done
 }
 
@@ -353,15 +352,19 @@ install_python_packages() {
 
     show_message "Installing Python packages..."
     for package in "${packages[@]}"; do
-        display_yellow "Installing Python package: $package"
-        if pip install --upgrade "$package" >/dev/null 2>&1; then
-            display_green "Successfully installed $package"
-            log_message "INFO" "Python package installed: $package"
-        else
-            display_red "Failed to install Python package: $package"
-            log_message "ERROR" "Failed to install Python package: $package"
-        fi
+        show_message "Installing package: $package"
+        install_package "pip install --upgrade" "$package"
     done
+    # for package in "${packages[@]}"; do
+        # display_yellow "Installing Python package: $package"
+        # if pip install --upgrade "$package" >/dev/null 2>&1; then
+            # display_green "Successfully installed $package"
+            # log_message "INFO" "Python package installed: $package"
+        # else
+            # display_red "Failed to install Python package: $package"
+            # log_message "ERROR" "Failed to install Python package: $package"
+        # fi
+    # done
 }
 
 # Node.js packages installation
@@ -382,15 +385,19 @@ install_node_packages() {
 
     show_message "Installing Node.js packages..."
     for package in "${packages[@]}"; do
-        display_yellow "Installing Node.js package: $package"
-        if npm install -g "$package" >/dev/null 2>&1; then
-            display_green "Successfully installed $package"
-            log_message "INFO" "Node.js package installed: $package"
-        else
-            display_red "Failed to install Node.js package: $package"
-            log_message "ERROR" "Failed to install Node.js package: $package"
-        fi
+        show_message "Installing package: $package"
+        install_package "npm install -g" "$package"
     done
+    # for package in "${packages[@]}"; do
+        # display_yellow "Installing Node.js package: $package"
+        # if npm install -g "$package" >/dev/null 2>&1; then
+            # display_green "Successfully installed $package"
+            # log_message "INFO" "Node.js package installed: $package"
+        # else
+            # display_red "Failed to install Node.js package: $package"
+            # log_message "ERROR" "Failed to install Node.js package: $package"
+        # fi
+    # done
 }
 
 # PHP Composer setup

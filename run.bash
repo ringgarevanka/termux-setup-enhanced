@@ -40,13 +40,13 @@ display_blue() {
 
 show_header() {
     clear
-    display_green "╔════════════════════════════════════════════╗"
+    display_green "══════════════════════════════════════════════"
     display_green " $SCRIPT_NAME"
     display_green " $SCRIPT_DESCRIPTION"
     display_green " v$SCRIPT_VERSION"
     display_green " By: $DEVELOPER"
     display_green " $DEV_USERNAME"
-    display_green "╚════════════════════════════════════════════╝"
+    display_green "══════════════════════════════════════════════"
     echo
 }
 
@@ -189,110 +189,127 @@ install_essential_packages() {
         termux-auth
         termux-exec
 
-        # Basic tools
+        # Basic System Tools
         coreutils
         procps
-        htop
-        vim
-        nano
-        emacs
-        less
-
-        # Network tools
-        curl
-        wget
-        openssh
-        nmap
-        dnsutils
-        iproute2
-
-        # Development tools
+        util-linux
+        proot
+        proot-distro
+    
+        # Version Management & Control
         git
+        git-lfs
+        subversion
+    
+        # Development Tools
         make
         clang
+        libffi
         cmake
         shfmt
         pkg-config
-
-        # Programming languages
+        autoconf
+        automake
+        libtool
+    
+        # Programming language
+        ## Python
         python
+        python2
         python-pip
-        nodejs-lts
+    
+        ## Java
         openjdk-11
         openjdk-11-x
         openjdk-17
         openjdk-17-x
         openjdk-21
         openjdk-21-x
+    
+        ## Other Languages
+        nodejs-lts
         ruby
+        rust
         perl
         php
         golang
-
-        # Shell environments
-        zsh
-        fish
-        tmux
-        screen
-
-        # Text processing
+    
+        # Network Tools
+        ## Connectivity Tools
+        curl
+        wget
+        openssh
+        sshpass
+    
+        ## Network Analysis Tools
+        nmap
+        dnsutils
+        iproute2
+        httping
+        tcpdump
+        wireshark-gtk
+    
+        ## Browser Text
+        w3m
+        ddgr
+    
+        ## Network Access
+        Cloudflared
+    
+        # Text & Processing Tools
+        ## Editor
+        vim
+        nano
+        emacs
+    
+        ## Text Utilities
+        less
         grep
         sed
         jq
-
-        # Compression tools
+        figlet
+        libxml2-utils
+    
+        # Compression Tool
         zip
         unzip
         tar
         gzip
         bzip2
-
-        # System monitors
-        neofetch
+    
+        # Monitoring System
         fastfetch
         htop
         ncdu
-
-        # Media tools
+    
+        # Media Tools
         ffmpeg
         imagemagick
-
-        # Security tools
+    
+        # Security
         openssl
         gnupg
-
+        sshpass
+    
         # Database
         sqlite
         postgresql
-
-        # Additional utilities
+    
+        # Additional Utilities
         fzf
         ripgrep
         bat
         fd
         tree
-
-        # Development environments
-        vim-python
-
-        # Version control
-        git-lfs
-        subversion
-
-        # Build tools
-        autoconf
-        automake
-        libtool
-
-        # Network analysis
-        tcpdump
-        wireshark-gtk
-
-        # System tools
-        proot
-        proot-distro
-        util-linux
-
+        fakeroot
+        cowsay
+    
+        # Shell Environment
+        zsh
+        fish
+        tmux
+        screen
+    
         # Documentation
         man
         texinfo
@@ -307,26 +324,28 @@ install_essential_packages() {
 # Python packages installation
 install_python_packages() {
     local -r packages=(
-        # Package management and virtual environments
+        # Package Management and Virtual Environments
         setuptools
         virtualenv
-
-        # Interactive development
+        
+        # Interactive Development
         ipython
-
-        # Web development
+        
+        # Web Development Frameworks
         flask
         django
-
-        # Web scraping and automation
+        
+        # Web Scraping, Automation and Networking
+        requests[socks]
         requests
         beautifulsoup4
         selenium
-
-        # Image and video processing
+        httpie
+        
+        # Image and Video Processing
         pillow
-
-        # Code quality and testing
+        
+        # Code Quality and Testing
         pytest
         black
         pylint
@@ -348,10 +367,10 @@ install_python_packages() {
 # Node.js packages installation
 install_node_packages() {
     local -r packages=(
-        # Package management
+        # Package Management
         yarn
 
-        # Development tools
+        # Development Tools
         typescript
         nodemon
         pm2
@@ -467,14 +486,12 @@ source ~/.alias
 
 # Main
 clear
-neofetch --backend off
+fastfetch -l none
 EOF
 
     rm -rf "$HOME_DIR/.alias"
     cat >"$HOME_DIR/.alias" <<EOF
-# File: .alias
-# Aliases for Termux
-# Some 'aliases' may not work
+# Aliases
 
 alias la='ls -a'         # List all files and directories, including hidden ones, in long format
 alias ll='ls -lah'           # List files and directories in long format
@@ -503,7 +520,7 @@ alias pg='pkg upgrade'     # Upgrade packages (alternative to apt)
 alias pi='pkg install'     # Install a package (alternative to apt)
 alias pr='pkg remove'      # Remove a package (alternative to apt)
 alias ps='pkg search'      # Search for packages (alternative to apt)
-alias uall='apt update -y && apt upgrade -y && pkg update -y && pkg upgrade -y'  # Update and Upgrade
+alias apug='apt update -y && apt upgrade -y && pkg update -y && pkg upgrade -y'  # Update and Upgrade
 alias c='clear'           # Clear the terminal screen
 EOF
 
@@ -539,6 +556,9 @@ cleanup() {
     # Remove temporary files
     rm -rf "${TERMUX_DIR}/tmp/"* 2>/dev/null
     rm -rf "${HOME_DIR}/.termux/tmp/"* 2>/dev/null
+
+    # Clean bash path cache
+    hash -r
 
     # Clean pip cache
     pip cache purge
@@ -578,11 +598,11 @@ main() {
         return 1
     fi
 
-    display_green "╔════════════════════════════════════════════╗"
+    display_green "══════════════════════════════════════════════"
     display_green " Setup completed successfully!"
     display_green " "
     display_green " Please restart Termux to apply changes."
-    display_green "╚════════════════════════════════════════════╝"
+    display_green "══════════════════════════════════════════════"
 
     log_message "INFO" "Setup completed successfully"
     return 0
@@ -590,7 +610,5 @@ main() {
 
 # Execute with proper initialization and cleanup
 initialize_environment
-sleep 1
 main
-sleep 1
 cleanup
